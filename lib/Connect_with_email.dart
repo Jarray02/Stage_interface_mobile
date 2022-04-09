@@ -57,6 +57,7 @@ class _MyEmailState extends State<EmailPgae> {
                   ),
                   SizedBox(height: 20.0),
                   TextField(
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'Enter your email',
                       border: OutlineInputBorder(
@@ -73,6 +74,7 @@ class _MyEmailState extends State<EmailPgae> {
                   ),
                   SizedBox(height: 8.0),
                   TextField(
+                    obscureText: true,
                     decoration: InputDecoration(
                       hintText: '***********',
                       border: OutlineInputBorder(

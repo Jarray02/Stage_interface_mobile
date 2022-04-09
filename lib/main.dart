@@ -43,7 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(60.0, 60.0, 60.0, 30.0),
+          padding:
+              const EdgeInsets.symmetric(vertical: 100.0, horizontal: 50.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -59,7 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Connect_with_email');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => const ConnectWithEmail()),
+                  );
                 },
                 child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -82,7 +86,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Connect_with_phone');
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ConnectWithPhone(),
+                    ),
+                  );
                 },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,

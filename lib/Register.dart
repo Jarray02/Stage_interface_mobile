@@ -75,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   SizedBox(height: 8.0),
                   TextField(
+                    obscureText: true,
                     decoration: InputDecoration(
                       hintText: '***********',
                       border: OutlineInputBorder(
@@ -97,7 +98,9 @@ class _MyHomePageState extends State<MyHomePage> {
             padding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 20.0),
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/main');
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ));
               },
               child: const Text(
                 'Already have an account? Log in',
