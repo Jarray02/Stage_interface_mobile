@@ -1,6 +1,6 @@
-import 'package:first_flutter_project/Services/auth.dart';
+import '../Services/auth_services.dart';
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Screens/Register.dart';
+import 'package:first_flutter_project/Screens/register.dart';
 
 class ConnectWithEmail extends StatelessWidget {
   const ConnectWithEmail({Key? key}) : super(key: key);
@@ -123,8 +123,8 @@ class _MyEmailState extends State<EmailPgae> {
                             MaterialStateProperty.all(const Size(300.0, 50.0)),
                       ),
                       onPressed: () async {
-                        await _auth.SignInWithEmailandPassword(
-                                _emailtext.text.trim(),
+                        await _auth
+                            .signInWithEmailandPassword(_emailtext.text.trim(),
                                 _passwordtext.text.trim())
                             .whenComplete(() {
                           Navigator.of(context).pop;

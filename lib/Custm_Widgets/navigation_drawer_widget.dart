@@ -1,8 +1,8 @@
-import 'package:first_flutter_project/Screens/Connect_with_email.dart';
-import 'package:first_flutter_project/Screens/Connect_with_phone.dart';
-import 'package:first_flutter_project/Screens/Register.dart';
-import 'package:first_flutter_project/Screens/WelcomPage.dart';
-import 'package:first_flutter_project/Services/auth.dart';
+import 'package:first_flutter_project/Screens/connect_with_email.dart';
+import 'package:first_flutter_project/Screens/connect_with_phone.dart';
+import 'package:first_flutter_project/Screens/register.dart';
+import 'package:first_flutter_project/Screens/welcome_page.dart';
+import 'package:first_flutter_project/Services/auth_services.dart';
 import 'package:flutter/material.dart';
 
 class NavigationDrawerWidget extends StatelessWidget {
@@ -52,7 +52,7 @@ class NavigationDrawerWidget extends StatelessWidget {
                 icon: Icons.exit_to_app,
                 onPressed: () async {
                   try {
-                    await _auth.SignOut();
+                    await _auth.signOut();
                     selectedItem(context, 4);
                   } catch (error) {
                     print(error.toString());

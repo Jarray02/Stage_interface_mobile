@@ -1,6 +1,6 @@
-import 'package:first_flutter_project/Services/auth.dart';
+import 'package:first_flutter_project/Services/auth_services.dart';
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Custm_Widgets/Wrapper.dart';
+import 'package:first_flutter_project/Custm_Widgets/wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Screens/Register.dart';
+import 'package:first_flutter_project/Screens/register.dart';
 
 class ConnectWithPhone extends StatelessWidget {
   const ConnectWithPhone({Key? key}) : super(key: key);

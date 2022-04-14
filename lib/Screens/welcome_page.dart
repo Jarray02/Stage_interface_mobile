@@ -1,8 +1,8 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Screens/Connect_with_phone.dart';
-import 'package:first_flutter_project/Screens/Connect_with_email.dart';
-import 'package:first_flutter_project/Screens/Register.dart';
+import 'package:first_flutter_project/Screens/connect_with_phone.dart';
+import 'package:first_flutter_project/Screens/connect_with_email.dart';
+import 'package:first_flutter_project/Screens/register.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -52,7 +52,7 @@ class _WelcomePageState extends State<MyWelcomePage> {
               ElevatedButton(
                 style: ButtonStyle(
                   fixedSize: MaterialStateProperty.all(
-                    const Size(350.0, 45.0),
+                    const Size(350.0, 50.0),
                   ),
                 ),
                 onPressed: () {
@@ -78,7 +78,7 @@ class _WelcomePageState extends State<MyWelcomePage> {
               ElevatedButton(
                 style: ButtonStyle(
                   fixedSize: MaterialStateProperty.all(
-                    const Size(350.0, 45.0),
+                    const Size(350.0, 50.0),
                   ),
                 ),
                 onPressed: () {

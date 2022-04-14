@@ -1,10 +1,9 @@
-// ignore: file_names
-import 'package:first_flutter_project/Screens/HomePage.dart';
-import 'package:first_flutter_project/Screens/WelcomPage.dart';
-import 'package:first_flutter_project/Services/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Custm_Widgets/User.dart';
-import 'package:first_flutter_project/Custm_Widgets/custm_alert_dialog.dart';
+import 'homePage.dart';
+import 'welcome_page.dart';
+import '../Screens/homePage.dart';
+import '../Custm_Widgets/verify_email_alert.dart';
+import '../Services/auth_services.dart';
 
 class Register extends StatelessWidget {
   const Register({Key? key}) : super(key: key);
@@ -12,13 +11,13 @@ class Register extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Register Page',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyRegisterPage(title: 'Flutter Demo Home Page'),
+      home: const MyRegisterPage(title: 'Register Page'),
       routes: {
-        '/HomePage': (context) => const MyHomePage(),
+        '/homePage': (context) => const MyHomePage(),
       },
     );
   }
@@ -34,11 +33,15 @@ class MyRegisterPage extends StatefulWidget {
 }
 
 class _MyRegisterPageState extends State<MyRegisterPage> {
+  final Authentication _auth = Authentication();
+  final _emailtext = TextEditingController();
+  final _passwordtext = TextEditingController();
+  bool _visibile = true;
   @override
   Widget build(BuildContext context) {
-    final Authentication _auth = Authentication();
-    final _emailtext = TextEditingController();
-    final _passwordtext = TextEditingController();
+    String description =
+        'A Verification Email Has been sent! Please check your inbox';
+    ;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -84,15 +87,26 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
                     const SizedBox(height: 15.0),
                     TextField(
                       controller: _passwordtext,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: '***********',
-                        border: OutlineInputBorder(
+                        border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                           borderSide: BorderSide(
                             color: Colors.blue,
                           ),
                         ),
-                        suffixIcon: Icon(Icons.lock, color: Colors.amber),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _visibile = !_visibile;
+                            });
+                          },
+                          icon: _visibile
+                              ? const Icon(Icons.visibility,
+                                  color: Colors.amber)
+                              : const Icon(Icons.visibility_off,
+                                  color: Colors.amber),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 2.0),
@@ -114,26 +128,27 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
                           style: TextStyle(fontSize: 20.0, letterSpacing: 1.0),
                         ),
                         onPressed: () async {
-                          _auth.CreateUserWithEmailandPassword(
+                          await _auth
+                              .createUserWithEmailandPassword(
                                   _emailtext.text.trim(),
                                   _passwordtext.text.trim())
                               .whenComplete(() async {
+                            _auth.sendEmailVerification();
+                            print('Registration successfull');
+                            if (!_auth.emailverified()) {
+                              description =
+                                  'Email Not verified! Please check your email';
+                            }
                             showDialog(
                                 context: context,
                                 builder: (context) => CustmAlertDialog(
-                                    title: 'Verification',
-                                    description:
-                                        'A Verification Email Has been sent! Please check your inbox'));
-                            Users user = Users(
-                                email: _emailtext.text.trim(),
-                                password: _passwordtext.text.trim(),
-                                phoneNumber: null);
-                            Navigator.of(context).pop;
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const MyHomePage()));
+                                    title: 'Email Verification',
+                                    description: description,
+                                    image: 'assets/email_sent.gif'));
                           }).onError((error, stackTrace) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(error.toString())));
+                            print('Message3:' + error.toString());
                           });
                         }),
                     const SizedBox(height: 20.0),
@@ -145,6 +160,7 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
               alignment: Alignment.center,
               child: TextButton(
                 onPressed: () {
+                  dispose();
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => const WelcomePage(),
