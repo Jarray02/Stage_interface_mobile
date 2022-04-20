@@ -1,9 +1,11 @@
+import 'package:first_flutter_project/Custm_Widgets/custm_widgets.dart';
 import 'package:first_flutter_project/Services/auth_services.dart';
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Custm_Widgets/wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'Screens/screens.dart';
+import 'theme.dart';
 
 // This widget is the root of our application.
 void main() async {
@@ -21,10 +23,10 @@ class MyApp extends StatelessWidget {
       value: Authentication().user,
       initialData: null,
       child: MaterialApp(
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: ThemeMode.light,
         title: 'Main',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
         home: const Wrapper(),
       ),
     );

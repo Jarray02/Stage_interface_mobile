@@ -1,6 +1,6 @@
 import 'package:first_flutter_project/Services/auth_services.dart';
 import 'package:flutter/material.dart';
-import '../Screens/homePage.dart';
+import '../Screens/home_page.dart';
 import '../Services/auth_services.dart';
 import 'dart:async';
 
@@ -13,24 +13,40 @@ class CustmAlertDialog extends StatefulWidget {
 }
 
 class _MyCustmAlertDialogState extends State<CustmAlertDialog> {
-  Timer? timer;
   final Authentication _auth = Authentication();
   String title = 'Email Verification';
   String image = 'assets/email_sent.gif';
   String description =
       'A Verification Email Has been sent! Please check your inbox';
+  String buttonText = 'Resend';
+  Timer? timer1, timer2;
+  bool _clickable = false;
+  int count = 30;
+  String counttext = '';
 
   @override
   void initState() {
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    timer1 = Timer.periodic(const Duration(seconds: 3), (timer) {
       _auth.emailverified();
+    });
+
+    timer2 = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        count--;
+        if (count <= 0) {
+          count = 0;
+          _clickable = true;
+          counttext = '';
+        }
+      });
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    timer1?.cancel();
+    timer2?.cancel();
     super.dispose();
   }
 
@@ -46,7 +62,7 @@ class _MyCustmAlertDialogState extends State<CustmAlertDialog> {
     }
   }
 
-  dialogContent(BuildContext context) {
+  Widget dialogContent(BuildContext context) {
     return Stack(
       children: <Widget>[
         Container(
@@ -81,16 +97,32 @@ class _MyCustmAlertDialogState extends State<CustmAlertDialog> {
             const SizedBox(height: 24),
             Align(
               alignment: Alignment.bottomCenter,
-              child: ElevatedButton(
-                child: const Text('Ok'),
-                onPressed: () {
-                  if (_auth.emailverified()) {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const MyHomePage()));
-                  } else {
-                    description = 'Email Not verified! Please check your email';
-                  }
-                },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: _clickable
+                          ? MaterialStateProperty.all<Color>(Colors.blue)
+                          : MaterialStateProperty.all<Color>(Colors.grey),
+                      textStyle: _clickable
+                          ? MaterialStateProperty.all<TextStyle>(
+                              const TextStyle(color: Colors.white))
+                          : MaterialStateProperty.all<TextStyle>(
+                              TextStyle(color: Colors.grey.shade500)),
+                    ),
+                    child: Text('$buttonText $counttext'),
+                    onPressed: () {
+                      _clickable
+                          ? {
+                              _auth.sendEmailVerification(),
+                              _clickable = false,
+                              count = 30
+                            }
+                          : counttext = '$count';
+                    },
+                  ),
+                ],
               ),
             ),
           ]),

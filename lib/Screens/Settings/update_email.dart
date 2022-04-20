@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
-import '../Screens/screens.dart';
 
-class ConnectWithPhone extends StatelessWidget {
-  const ConnectWithPhone({Key? key}) : super(key: key);
+import '../../Services/auth_services.dart';
+
+class UpdateEmail extends StatelessWidget {
+  const UpdateEmail({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Connect with phone',
+      title: 'Update Email',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const PhonePage(title: 'Connect with phone'),
-      routes: {
-        '/Register': (context) => const Register(),
-      },
+      home: const MyUpdateEmail(title: 'Update Email'),
     );
   }
 }
 
-class PhonePage extends StatefulWidget {
-  const PhonePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+class MyUpdateEmail extends StatefulWidget {
+  const MyUpdateEmail({Key? key, required title}) : super(key: key);
 
   @override
-  State<PhonePage> createState() => _MyPhonePageState();
+  State<MyUpdateEmail> createState() => _UpdateEmailState();
 }
 
-class _MyPhonePageState extends State<PhonePage> {
+class _UpdateEmailState extends State<MyUpdateEmail> {
+  final _emailtext = TextEditingController();
+  final _passwordtext = TextEditingController();
+  final _newemail = TextEditingController();
+  final Authentication _auth = Authentication();
   bool _visibile = true;
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class _MyPhonePageState extends State<PhonePage> {
                     ),
                     const Divider(height: 45.0),
                     const Text(
-                      'Connect with your phone',
+                      'Update your Email',
                       style: TextStyle(
                         fontSize: 25.0,
                         wordSpacing: 2.0,
@@ -57,10 +57,11 @@ class _MyPhonePageState extends State<PhonePage> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20.0),
-                    const TextField(
+                    TextField(
+                      controller: _emailtext,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your phone',
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your email',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                           borderSide: BorderSide(
@@ -75,6 +76,25 @@ class _MyPhonePageState extends State<PhonePage> {
                     ),
                     const SizedBox(height: 15.0),
                     TextField(
+                      controller: _newemail,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your new email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          borderSide: BorderSide(
+                            color: Colors.blue,
+                          ),
+                        ),
+                        suffixIcon: Icon(
+                          Icons.email,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15.0),
+                    TextField(
+                      controller: _passwordtext,
                       obscureText: _visibile,
                       decoration: InputDecoration(
                         hintText: '***********',
@@ -102,45 +122,35 @@ class _MyPhonePageState extends State<PhonePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 2.0),
-                    Container(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text('Forgot password?'),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        alignment: Alignment.center,
+                        fixedSize:
+                            MaterialStateProperty.all(const Size(300.0, 50.0)),
+                      ),
+                      onPressed: () async {
+                        await _auth
+                            .updateUserEmail(_emailtext.text, _newemail.text,
+                                _passwordtext.text)
+                            .then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Email Updated Successfully')));
+                        }).onError((error, stackTrace) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(error.toString())));
+                        });
+                      },
+                      child: const Text(
+                        'Update email',
+                        style: TextStyle(
+                          letterSpacing: 1.0,
+                          fontSize: 20.0,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 20.0),
-                    ElevatedButton(
-                        style: ButtonStyle(
-                            alignment: Alignment.center,
-                            fixedSize: MaterialStateProperty.all(
-                                const Size(300.0, 50.0))),
-                        child: const Text(
-                          'Connect',
-                          style: TextStyle(fontSize: 20.0, letterSpacing: 1.0),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => const MyHomePage()));
-                        }),
-                    const SizedBox(height: 20.0),
                   ],
-                ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.center,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const Register()),
-                  );
-                },
-                child: const Text(
-                  "Don't have an account? Register",
-                  style: TextStyle(fontSize: 15.0, letterSpacing: 1.0),
                 ),
               ),
             ),

@@ -1,7 +1,4 @@
-import 'package:first_flutter_project/Screens/connect_with_email.dart';
-import 'package:first_flutter_project/Screens/connect_with_phone.dart';
-import 'package:first_flutter_project/Screens/register.dart';
-import 'package:first_flutter_project/Screens/welcome_page.dart';
+import 'package:first_flutter_project/Screens/screens.dart';
 import 'package:first_flutter_project/Services/auth_services.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +52,7 @@ class NavigationDrawerWidget extends StatelessWidget {
                     await _auth.signOut();
                     selectedItem(context, 4);
                   } catch (error) {
-                    print(error.toString());
+                    debugPrint(error.toString());
                   }
                 },
               ),
@@ -88,7 +85,7 @@ class NavigationDrawerWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const ConnectWithEmail(),
+          builder: (context) => const ProfileSettings(),
         ));
         break;
       case 1:
@@ -98,12 +95,12 @@ class NavigationDrawerWidget extends StatelessWidget {
         break;
       case 2:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const WelcomePage(),
+          builder: (context) => const MessagesPage(),
         ));
         break;
       case 3:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const Register(),
+          builder: (context) => const UserSettings(),
         ));
         break;
       case 4:

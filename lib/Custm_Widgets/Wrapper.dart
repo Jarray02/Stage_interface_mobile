@@ -1,6 +1,6 @@
-import '../Screens/homePage.dart';
-import '../Screens/welcome_page.dart';
 import 'package:flutter/material.dart';
+import '../Screens/home_page.dart';
+import '../Screens/welcome_page.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
