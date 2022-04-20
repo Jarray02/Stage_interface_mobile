@@ -33,7 +33,7 @@ class _MyEmailState extends State<EmailPgae> {
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? const CircularProgressIndicator()
+        ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
             child: Column(
               children: [
@@ -127,17 +127,13 @@ class _MyEmailState extends State<EmailPgae> {
                             });
                             await _auth
                                 .signInWithEmailandPassword(
+                                    context,
                                     _emailtext.text.trim(),
                                     _passwordtext.text.trim())
-                                .then((_) {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const MyHomePage()),
-                              );
-                            }).onError((error, stackTrace) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(error.toString())));
-                            });
+                                .onError((error, stackTrace) =>
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(error.toString()))));
                           },
                           child: const Text(
                             'Connect',

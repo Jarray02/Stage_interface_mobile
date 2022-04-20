@@ -49,7 +49,7 @@ class NavigationDrawerWidget extends StatelessWidget {
                 icon: Icons.exit_to_app,
                 onPressed: () async {
                   try {
-                    await _auth.signOut();
+                    await _auth.signOut(context);
                     selectedItem(context, 4);
                   } catch (error) {
                     debugPrint(error.toString());

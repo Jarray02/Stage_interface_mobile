@@ -150,16 +150,13 @@ class _MyUpdatePasswordState extends State<MyUpdatePassword> {
                       ),
                       onPressed: () async {
                         await _auth
-                            .updateUserPassword(_emailtext.text,
+                            .updateUserPassword(context, _emailtext.text,
                                 _passwordtext.text, _newpasswordtext.text)
                             .then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content:
                                       Text('Password Updated Successfully')));
-                        }).onError((error, stackTrace) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(error.toString())));
                         });
                       },
                       child: const Text(

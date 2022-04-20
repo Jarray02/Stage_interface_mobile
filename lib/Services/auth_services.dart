@@ -1,33 +1,53 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import '../Screens/screens.dart';
 
 class Authentication {
   final _auth = FirebaseAuth.instance;
 
   //sign in with email & password
-  Future signInWithEmailandPassword(String email, String password) async {
+  Future signInWithEmailandPassword(
+      BuildContext context, String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomePage())));
     } on FirebaseAuthException catch (error) {
       if (error.code == 'user-not-found') {
-        debugPrint('No user found for that email.');
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No user found for that email.')));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const ConnectWithEmail()));
       } else if (error.code == 'wrong-password') {
-        debugPrint('Wrong password provided for that user.');
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Wrong password provided for that user.')));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const ConnectWithEmail()));
       }
     }
   }
 
   //Create user with email & password
-  Future createUserWithEmailandPassword(String email, String password) async {
+  Future createUserWithEmailandPassword(
+      BuildContext context, String email, String password) async {
     try {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseAuthException catch (error) {
       if (error.code == 'weak-password') {
-        debugPrint('The password provided is too weak.');
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('The password provided is too weak.')));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Register()));
       } else if (error.code == 'email-already-in-use') {
-        debugPrint('The account already exists for that email.');
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('The account already exists for that email.')));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Register()));
       }
     }
   }
@@ -35,29 +55,31 @@ class Authentication {
   //Create user with phone number
 
   //sign out
-  Future signOut() async {
+  Future signOut(BuildContext context) async {
     try {
       await _auth.signOut();
     } on FirebaseAuthException catch (error) {
-      debugPrint(error.toString());
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
     }
   }
 
   //Delete users account
-  Future<void> deleteUserAccount() async {
+  Future<void> deleteUserAccount(BuildContext context) async {
     try {
       await _auth.currentUser!.delete();
     } on FirebaseAuthException catch (error) {
       if (error.code == 'requires-recent-login') {
-        debugPrint(
-            'The user must reauthenticate before this operation can be executed.');
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'The user must reauthenticate before this operation can be executed.')));
       }
     }
   }
 
   //Update user email (this method requires the user to have recently signed in)
-  Future<void> updateUserEmail(
-      String email, String newEmail, String password) async {
+  Future<void> updateUserEmail(BuildContext context, String email,
+      String newEmail, String password) async {
     AuthCredential userCredential =
         EmailAuthProvider.credential(email: email, password: password);
 
@@ -67,12 +89,14 @@ class Authentication {
       userCredential.user!.updateEmail(newEmail);
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
     });
   }
 
   //Update user password (this method requires the user to have recently signed in)
-  Future<void> updateUserPassword(
-      String email, String password, String newPassword) async {
+  Future<void> updateUserPassword(BuildContext context, String email,
+      String password, String newPassword) async {
     AuthCredential userCredential =
         EmailAuthProvider.credential(email: email, password: password);
 
@@ -81,7 +105,8 @@ class Authentication {
         .then((userCredential) {
       userCredential.user!.updatePassword(newPassword);
     }).onError((error, stackTrace) {
-      debugPrint(error.toString());
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
     });
   }
 

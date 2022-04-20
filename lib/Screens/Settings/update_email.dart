@@ -131,15 +131,12 @@ class _UpdateEmailState extends State<MyUpdateEmail> {
                       ),
                       onPressed: () async {
                         await _auth
-                            .updateUserEmail(_emailtext.text, _newemail.text,
-                                _passwordtext.text)
+                            .updateUserEmail(context, _emailtext.text,
+                                _newemail.text, _passwordtext.text)
                             .then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text('Email Updated Successfully')));
-                        }).onError((error, stackTrace) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(error.toString())));
                         });
                       },
                       child: const Text(

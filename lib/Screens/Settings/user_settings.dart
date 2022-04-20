@@ -93,7 +93,7 @@ class _MySettingsState extends State<MySettings> {
                                 TextButton(
                                   child: const Text('OK'),
                                   onPressed: () async {
-                                    _auth.deleteUserAccount().then((_) {
+                                    _auth.deleteUserAccount(context).then((_) {
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>
@@ -102,10 +102,6 @@ class _MySettingsState extends State<MySettings> {
                                           .showSnackBar(const SnackBar(
                                               content: Text(
                                                   'Account deleted successfully')));
-                                    }).onError((error, stackTrace) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text(error.toString())));
                                     });
                                   },
                                 ),

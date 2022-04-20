@@ -1,8 +1,6 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
-import 'package:first_flutter_project/Screens/connect_with_phone.dart';
-import 'package:first_flutter_project/Screens/connect_with_email.dart';
-import 'package:first_flutter_project/Screens/register.dart';
+import 'package:first_flutter_project/Screens/screens.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
