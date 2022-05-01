@@ -122,18 +122,24 @@ class _MyEmailState extends State<EmailPgae> {
                                 const Size(300.0, 50.0)),
                           ),
                           onPressed: () async {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            await _auth
-                                .signInWithEmailandPassword(
-                                    context,
-                                    _emailtext.text.trim(),
-                                    _passwordtext.text.trim())
-                                .onError((error, stackTrace) =>
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text(error.toString()))));
+                            if (_verifyTextField(
+                                context,
+                                _emailtext.text.trim(),
+                                _passwordtext.text.trim())) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              await _auth
+                                  .signInWithEmailandPassword(
+                                      context,
+                                      _emailtext.text.trim(),
+                                      _passwordtext.text.trim())
+                                  .onError((error, stackTrace) =>
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content:
+                                                  Text(error.toString()))));
+                            }
                           },
                           child: const Text(
                             'Connect',
@@ -163,5 +169,19 @@ class _MyEmailState extends State<EmailPgae> {
               ],
             ),
           );
+  }
+
+  bool _verifyTextField(BuildContext context, String? email, String? password) {
+    if (email == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please put a valid email')));
+      return false;
+    } else if (password == null || password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please put a valid password')));
+      return false;
+    } else {
+      return true;
+    }
   }
 }

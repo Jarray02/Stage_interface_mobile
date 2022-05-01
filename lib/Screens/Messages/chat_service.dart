@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:faker/faker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:first_flutter_project/Custm_Widgets/custm_widgets.dart';
 import 'package:first_flutter_project/Services/storage_service.dart';
 import 'package:first_flutter_project/models/message_data.dart';
@@ -24,25 +26,32 @@ String randomString() {
 }
 
 class MessagingService extends StatelessWidget {
-  static Route route(MessageData data) => MaterialPageRoute(
-      builder: (context) => MessagingService(messageData: data));
+  static Route route(MessageData data, String userPic) => MaterialPageRoute(
+      builder: (context) => MessagingService(
+            messageData: data,
+            userPic: userPic,
+          ));
   final MessageData messageData;
+  final String userPic;
 
-  const MessagingService({Key? key, required this.messageData})
+  const MessagingService(
+      {Key? key, required this.messageData, required this.userPic})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.dark,
-      home: const MyMessagingService(),
+      themeMode: ThemeMode.light,
+      home: MyMessagingService(userPic: userPic),
     );
   }
 }
 
 class MyMessagingService extends StatefulWidget {
-  const MyMessagingService({Key? key}) : super(key: key);
+  const MyMessagingService({Key? key, required this.userPic}) : super(key: key);
+
+  final String userPic;
 
   @override
   _MyMessagingServiceState createState() => _MyMessagingServiceState();
@@ -52,6 +61,8 @@ class _MyMessagingServiceState extends State<MyMessagingService> {
   final storage = Storage();
   final List<types.Message> _messages = [];
   final _user = const types.User(id: '06c33e8b-e835-4736-80f4-63f44b66666c');
+  final DatabaseReference _ref = FirebaseDatabase.instance.ref();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _addMessage(types.Message message) {
     setState(() {
@@ -173,7 +184,7 @@ class _MyMessagingServiceState extends State<MyMessagingService> {
     });
   }
 
-  void _handleSendPressed(types.PartialText message) {
+  void _handleSendPressed(types.PartialText message) async {
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -182,8 +193,12 @@ class _MyMessagingServiceState extends State<MyMessagingService> {
     );
 
     _addMessage(textMessage);
-    FirebaseChatCore.instance
-        .sendMessage(textMessage, 'TODO : // ADD THE ROOM ID');
+    await _ref.child('ChatMessages').set({
+      "author": _auth.currentUser!.uid,
+      "createdAt": DateTime.now().millisecondsSinceEpoch,
+      "id": randomString(),
+      "text": message.text
+    });
   }
 
   @override
@@ -197,7 +212,8 @@ class _MyMessagingServiceState extends State<MyMessagingService> {
           leading: IconButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const MessagesPage()));
+                    builder: (context) =>
+                        MessagesPage(userPic: widget.userPic)));
               },
               icon: const Icon(Icons.arrow_back)),
           title: Text(faker.person.name()),

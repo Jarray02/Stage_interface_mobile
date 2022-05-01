@@ -1,31 +1,18 @@
-import 'package:first_flutter_project/Screens/Messages/messages.dart';
 import 'package:flutter/material.dart';
+import '../../Services/services.dart';
+import '../screens.dart';
 
-import '../../theme.dart';
+class ProfileSettings extends StatefulWidget {
+  const ProfileSettings({Key? key, required this.userPic}) : super(key: key);
 
-class ProfileSettings extends StatelessWidget {
-  const ProfileSettings({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Settings',
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.dark,
-      home: const MyProfileSettings(title: 'Profile Settings'),
-    );
-  }
-}
-
-class MyProfileSettings extends StatefulWidget {
-  const MyProfileSettings({Key? key, required title}) : super(key: key);
+  final String userPic;
 
   @override
-  State<MyProfileSettings> createState() => _MyProfileSettingsState();
+  State<ProfileSettings> createState() => _MyProfileSettingsState();
 }
 
-class _MyProfileSettingsState extends State<MyProfileSettings> {
+class _MyProfileSettingsState extends State<ProfileSettings> {
+  final Authentication _auth = Authentication();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +20,7 @@ class _MyProfileSettingsState extends State<MyProfileSettings> {
         leading: IconButton(
             onPressed: () {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => const MessagesPage()));
+                  builder: (context) => MessagesPage(userPic: widget.userPic)));
             },
             icon: const Icon(Icons.arrow_back)),
         centerTitle: true,
@@ -54,7 +41,13 @@ class _MyProfileSettingsState extends State<MyProfileSettings> {
               onPressed: () {}, child: const Text('Update your family name')),
           const Divider(color: Colors.blue, height: 2.0),
           TextButton(
-              onPressed: () {}, child: const Text('Delete your account')),
+              onPressed: () async {
+                await _auth.deleteUserAccount(context).then((value) {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const WelcomePage()));
+                });
+              },
+              child: const Text('Delete your account')),
         ]),
       ),
     );

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../Screens/screens.dart';
@@ -9,7 +8,7 @@ class Authentication {
   final _auth = FirebaseAuth.instance;
 
   //sign in with email & password
-  Future signInWithEmailandPassword(
+  Future<void> signInWithEmailandPassword(
       BuildContext context, String email, String password) async {
     try {
       await _auth
@@ -32,7 +31,7 @@ class Authentication {
   }
 
   //Create user with email & password
-  Future createUserWithEmailandPassword(
+  Future<void> createUserWithEmailandPassword(
       BuildContext context, String email, String password) async {
     try {
       await _auth.createUserWithEmailAndPassword(
@@ -52,10 +51,8 @@ class Authentication {
     }
   }
 
-  //Create user with phone number
-
   //sign out
-  Future signOut(BuildContext context) async {
+  Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
     } on FirebaseAuthException catch (error) {
@@ -64,7 +61,7 @@ class Authentication {
     }
   }
 
-  //Delete users account
+  //Delete user account
   Future<void> deleteUserAccount(BuildContext context) async {
     try {
       await _auth.currentUser!.delete();
@@ -77,7 +74,7 @@ class Authentication {
     }
   }
 
-  //Update user email (this method requires the user to have recently signed in)
+  //Update user email (this method requires the user to reauthenticate)
   Future<void> updateUserEmail(BuildContext context, String email,
       String newEmail, String password) async {
     AuthCredential userCredential =
@@ -86,7 +83,13 @@ class Authentication {
     await _auth.currentUser!
         .reauthenticateWithCredential(userCredential)
         .then((userCredential) {
-      userCredential.user!.updateEmail(newEmail);
+      _auth.currentUser!.verifyBeforeUpdateEmail(newEmail).then((_) {
+        _auth.currentUser!.updateEmail(newEmail);
+      }).onError((error, stackTrace) {
+        debugPrint(error.toString());
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
+      });
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       ScaffoldMessenger.of(context)
@@ -103,7 +106,7 @@ class Authentication {
     await _auth.currentUser!
         .reauthenticateWithCredential(userCredential)
         .then((userCredential) {
-      userCredential.user!.updatePassword(newPassword);
+      _auth.currentUser!.updatePassword(newPassword);
     }).onError((error, stackTrace) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error.toString())));
@@ -154,7 +157,7 @@ class Authentication {
     }
   }
 
-  //Listen to users current authentication state (i.e Currently logged in or not)
+  //Listen to users current authentication state (i.e currently logged in or not)
   Stream<User?> get user {
     return _auth.authStateChanges();
   }

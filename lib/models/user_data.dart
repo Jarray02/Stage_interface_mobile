@@ -12,4 +12,12 @@ class UserData {
   final String? userLastName;
   final String userEmail;
   final String? userProfilePicture;
+
+  factory UserData.fromRTDB(Map<String, dynamic> data) {
+    return UserData(
+        userName: data['name'],
+        userLastName: data['lasname'],
+        userEmail: data['email'],
+        userProfilePicture: data['photoURL']);
+  }
 }

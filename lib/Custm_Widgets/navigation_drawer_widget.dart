@@ -1,9 +1,45 @@
+import 'dart:collection';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:first_flutter_project/Screens/screens.dart';
 import 'package:first_flutter_project/Services/auth_services.dart';
+import 'package:first_flutter_project/models/models.dart';
 import 'package:flutter/material.dart';
 
-class NavigationDrawerWidget extends StatelessWidget {
+class NavigationDrawerWidget extends StatefulWidget {
   const NavigationDrawerWidget({Key? key}) : super(key: key);
+
+  @override
+  State<NavigationDrawerWidget> createState() => _NavigationDrawerWidgetState();
+}
+
+class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseReference _ref = FirebaseDatabase.instance.ref();
+  String? _email, _username, _userlastname, _userprofilepic;
+
+  getUserPicture() async {
+    final event = await _ref
+        .child('Users/${_auth.currentUser!.uid}')
+        .once(DatabaseEventType.value);
+    final data = event.snapshot.value;
+    var userDataMap = Map<String, dynamic>.from(data as LinkedHashMap);
+
+    final userdata = UserData.fromRTDB(userDataMap);
+    setState(() {
+      _email = userdata.userEmail;
+      _username = userdata.userName;
+      _userlastname = userdata.userLastName;
+      _userprofilepic = userdata.userProfilePicture;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserPicture();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +52,32 @@ class NavigationDrawerWidget extends StatelessWidget {
           child: ListView(
             children: [
               const SizedBox(height: 50.0),
-              const Center(
-                child: CircleAvatar(
-                  foregroundImage: AssetImage('assets/logo.png'),
-                  radius: 80.0,
+              Center(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_userprofilepic != null)
+                      CircleAvatar(
+                        foregroundImage: NetworkImage(_userprofilepic!),
+                        radius: 80.0,
+                      ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 60.0),
+              const SizedBox(height: 20.0),
+              Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (_username != null)
+                      Text(_username!,
+                          style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white))
+                  ]),
+              const Divider(height: 40.0, color: Colors.white, thickness: 0.8),
               buildMenuItem(
                   text: 'Profile',
                   icon: Icons.person,
@@ -85,7 +140,7 @@ class NavigationDrawerWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const ProfileSettings(),
+          builder: (context) => ProfileSettings(userPic: _userprofilepic!),
         ));
         break;
       case 1:
@@ -95,7 +150,7 @@ class NavigationDrawerWidget extends StatelessWidget {
         break;
       case 2:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const MessagesPage(),
+          builder: (context) => MessagesPage(userPic: _userprofilepic!),
         ));
         break;
       case 3:

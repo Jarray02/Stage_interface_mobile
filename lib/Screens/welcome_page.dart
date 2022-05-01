@@ -7,25 +7,14 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tropical Bio',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyWelcomePage(title: 'Tropical Bio'),
-      routes: {
-        '/Connect_with_phone': (context) => const ConnectWithPhone(),
-        '/Connect_with_email': (context) => const ConnectWithEmail(),
-        '/Register': (context) => const Register(),
-      },
+    return const SafeArea(
+      child: MyWelcomePage(),
     );
   }
 }
 
 class MyWelcomePage extends StatefulWidget {
-  const MyWelcomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const MyWelcomePage({Key? key}) : super(key: key);
 
   @override
   State<MyWelcomePage> createState() => _WelcomePageState();

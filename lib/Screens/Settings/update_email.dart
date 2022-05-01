@@ -1,3 +1,4 @@
+import 'package:first_flutter_project/Custm_Widgets/custm_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../../Services/auth_services.dart';
@@ -134,6 +135,13 @@ class _UpdateEmailState extends State<MyUpdateEmail> {
                             .updateUserEmail(context, _emailtext.text,
                                 _newemail.text, _passwordtext.text)
                             .then((_) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => const CustmAlertDialog(
+                                  title: 'Email Verification',
+                                  description:
+                                      'Email Not verified! Please check your email',
+                                  image: 'assets/email_sent.gif'));
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text('Email Updated Successfully')));

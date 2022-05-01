@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:faker/faker.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:first_flutter_project/helpers.dart';
 import 'package:first_flutter_project/theme.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,15 @@ import '../../models/models.dart';
 import '../screens.dart';
 
 class MessagesPage extends StatelessWidget {
-  const MessagesPage({Key? key}) : super(key: key);
+  MessagesPage({Key? key, required this.userPic}) : super(key: key);
+
+  final String userPic;
+  final DatabaseReference _chatsRef =
+      FirebaseDatabase.instance.ref().child('Chats');
+  final DatabaseReference _userChatsRef =
+      FirebaseDatabase.instance.ref().child('UserChats');
+  final DatabaseReference _chatMessagesRef =
+      FirebaseDatabase.instance.ref().child('ChatMessages');
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +44,11 @@ class MessagesPage extends StatelessWidget {
                       icon: const Icon(Icons.search)),
                   const SizedBox(width: 3.0),
                   Avatar.small(
-                      url: Helpers.randomPictureUrl(),
+                      url: userPic,
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ProfileSettings()));
+                            builder: (context) =>
+                                ProfileSettings(userPic: userPic)));
                       }),
                 ],
               ),
@@ -60,6 +70,7 @@ class MessagesPage extends StatelessWidget {
     final Faker faker = Faker();
     final date = Helpers.randomDate();
     return _MessageTitle(
+      userPic: userPic,
       messageData: MessageData(
         senderName: faker.person.name(),
         message: faker.lorem.sentence(),
@@ -90,7 +101,7 @@ class SearchBar extends SearchDelegate<String> {
 
     await _firestore
         .collection('users')
-        .where("email", isEqualTo: query)
+        .where("name ", isEqualTo: query)
         .get()
         .then((value) {
       userMap = value.docs[0].data();
@@ -146,15 +157,19 @@ class SearchBar extends SearchDelegate<String> {
 }
 
 class _MessageTitle extends StatelessWidget {
-  const _MessageTitle({Key? key, required this.messageData}) : super(key: key);
+  const _MessageTitle(
+      {Key? key, required this.messageData, required this.userPic})
+      : super(key: key);
 
   final MessageData messageData;
+  final String userPic;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MessagingService.route(messageData));
+        Navigator.of(context)
+            .push(MessagingService.route(messageData, userPic));
       },
       child: Container(
         height: 100.0,

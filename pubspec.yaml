@@ -39,11 +39,14 @@ dependencies:
   firebase_database: ^9.0.11
   firebase_core: ^1.10.0
   firebase_dynamic_links: ^4.1.2
+  firebase_storage: ^10.2.12
+  cloud_firestore: ^3.1.12
 
   provider: ^6.0.2
 
   #Messaging services
   image_picker: ^0.8.5
+  image_cropper: ^1.5.1
   file_picker: ^4.5.1
   flutter_chat_ui: ^1.5.8
   flutter_chat_types: ^3.3.4
@@ -51,11 +54,14 @@ dependencies:
   google_fonts: ^2.3.1
   cached_network_image: ^3.2.0
   stream_chat_flutter_core: ^3.6.1
-  firebase_storage: ^10.2.12
   flutter_firebase_chat_core: ^1.5.4
   faker: ^2.0.0
   jiffy: ^5.0.0
-  cloud_firestore: ^3.1.12
+  flutter_image_compress: ^1.1.0
+  path_provider: ^2.0.9
+  liquid_progress_indicator: ^0.4.0
+  flutter_animation_progress_bar: ^2.1.1
+  velocity_x: ^3.4.0
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +90,10 @@ flutter:
     - assets/logo.png
     - assets/settings.gif
     - assets/default_profile_picture.jpg
+    - assets/algue.png
+    - assets/banane.webp
+    - assets/apple.png
+    - assets/orange.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

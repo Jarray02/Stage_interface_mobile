@@ -6,13 +6,16 @@ class Storage {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
-  Future<void> uploadProfileImage(String filePath, String fileName) async {
+  Future<String?> uploadProfileImage(String filePath, String fileName) async {
     File file = File(filePath);
+    String? url;
     try {
       await storage.ref('/profile_images').putFile(file);
+      url = await storage.ref().getDownloadURL();
     } on firebase_storage.FirebaseException catch (error) {
       debugPrint('error uploading profile picture ${error.toString()}');
     }
+    return url;
   }
 
   Future<firebase_storage.ListResult> listFiles() async {
