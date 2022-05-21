@@ -1,13 +1,11 @@
-import 'dart:collection';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:first_flutter_project/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animation_progress_bar/flutter_animation_progress_bar.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../Custm_Widgets/custm_widgets.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
-
-import 'screens.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -32,9 +30,11 @@ class _HomePageState extends State<HomePage> {
   final DatabaseReference _profileRef =
       FirebaseDatabase.instance.ref().child('profile');
   final PageController _pageController = PageController(initialPage: 0);
+  final CarouselController _carouselController = CarouselController();
   num _temperature = 0, _humidite = 0, _pression = 0;
   String _profile = 'banane';
   int _currentPageIndex = 0;
+  int currentIndex = 0;
   String _currentIcon = '';
   bool barIsSelected = true;
   List _profileList = [];
@@ -125,20 +125,8 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   width: 150,
                   height: 150,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                const ProfileDetailHomePage()));
-                      },
-                      child: Hero(
-                        tag: "ProfilePic",
-                        child: Image(
-                          image: NetworkImage(_currentIcon),
-                        ),
-                      ),
-                    ),
+                  child: Image(
+                    image: NetworkImage(_currentIcon),
                   ),
                 ),
                 Text('The current profile is $_profile'),
@@ -298,104 +286,114 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget profilSelector() {
-    int currentIndex = 0;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
       children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {
-            if (currentIndex != 0) {
-              setState(() {
-                currentIndex--;
-              });
-            }
-          },
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+              onPressed: () {
+                _carouselController.previousPage();
+              },
+            ),
+            SizedBox(
+              height: 300,
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: Stack(
+                children: [
+                  VxAnimatedBox().size(50, 50).make(),
+                  CarouselSlider.builder(
+                      carouselController: _carouselController,
+                      itemCount: _profileList.length,
+                      options: CarouselOptions(
+                          initialPage: 0,
+                          enableInfiniteScroll: false,
+                          enlargeCenterPage: true,
+                          aspectRatio: 1,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              currentIndex = index;
+                            });
+                          }),
+                      itemBuilder: (context, index, currentIndex) {
+                        final prof = _profileList[index];
+                        return VxBox(
+                                child: ZStack(
+                          [
+                            Positioned(
+                              top: 0.0,
+                              right: 0.0,
+                              child: VxBox(
+                                      // child: prof.maxTemp.text.uppercase.white
+                                      // .make()
+                                      // .px16(),
+                                      )
+                                  .height(40)
+                                  .black
+                                  .alignCenter
+                                  .withRounded(value: 16.0)
+                                  .make(),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: VStack(
+                                [
+                                  // prof.name.text.xl3.white.bold.make(),
+                                  5.heightBox,
+                                  // prof.maxTemp.text.sm.white.semiBold.make(),
+                                ],
+                                crossAlignment: CrossAxisAlignment.center,
+                              ),
+                            ),
+                            const Align(
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.play_arrow_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ))
+                            .clip(Clip.antiAlias)
+                            .bgImage(DecorationImage(
+                                image: NetworkImage(prof["icon"]),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.black.withOpacity(0.3),
+                                    BlendMode.darken)))
+                            .border(color: Colors.black, width: 5)
+                            .withRounded(value: 60.0)
+                            .make()
+                            .onInkTap(() async {
+                          await _ref.update({
+                            "currentProfile":
+                                prof['name'].toString().toLowerCase()
+                          });
+                        }).p16();
+                      }).centered(),
+                ],
+                fit: StackFit.expand,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                _carouselController.nextPage();
+              },
+            ),
+          ],
         ),
-        SizedBox(
-          height: 300,
-          width: MediaQuery.of(context).size.width * 0.6,
-          child: Stack(
-            children: [
-              VxAnimatedBox().size(50, 50).make(),
-              VxSwiper.builder(
-                  itemCount: _profileList.length,
-                  aspectRatio: 1.0,
-                  enlargeCenterPage: true,
-                  itemBuilder: (context, index) {
-                    final prof = _profileList[index];
-                    currentIndex = index;
-                    return VxBox(
-                            child: ZStack(
-                      [
-                        Positioned(
-                          top: 0.0,
-                          right: 0.0,
-                          child: VxBox(
-                                  // child: prof.maxTemp.text.uppercase.white
-                                  // .make()
-                                  // .px16(),
-                                  )
-                              .height(40)
-                              .black
-                              .alignCenter
-                              .withRounded(value: 16.0)
-                              .make(),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: VStack(
-                            [
-                              // prof.name.text.xl3.white.bold.make(),
-                              5.heightBox,
-                              // prof.maxTemp.text.sm.white.semiBold.make(),
-                            ],
-                            crossAlignment: CrossAxisAlignment.center,
-                          ),
-                        ),
-                        const Align(
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ))
-                        .clip(Clip.antiAlias)
-                        .bgImage(DecorationImage(
-                            image: NetworkImage(prof["icon"]),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                                Colors.black.withOpacity(0.3),
-                                BlendMode.darken)))
-                        .border(color: Colors.black, width: 5)
-                        .withRounded(value: 60.0)
-                        .make()
-                        .onInkTap(() async {
-                      await _ref.update({
-                        "currentProfile": prof['name'].toString().toLowerCase()
-                      });
-                    }).p16();
-                  }).centered(),
-            ],
-            fit: StackFit.expand,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.arrow_forward_ios,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            if (currentIndex != 3) {
-              setState(() {
-                currentIndex++;
-              });
-            }
-          },
-        ),
+        AnimatedSmoothIndicator(
+          activeIndex: currentIndex,
+          count: _profileList.length,
+          effect: const ExpandingDotsEffect(
+              activeDotColor: Color.fromARGB(255, 24, 115, 185)),
+        )
       ],
     );
   }
