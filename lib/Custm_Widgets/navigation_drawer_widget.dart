@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:first_flutter_project/Screens/screens.dart';
@@ -46,20 +47,30 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     final Authentication _auth = Authentication();
     return Drawer(
       child: Material(
-        color: Colors.blue,
+        color: const Color.fromARGB(255, 24, 115, 185),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
-              const SizedBox(height: 50.0),
+              const SizedBox(height: 20.0),
               Center(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (_userprofilepic != null)
+                    if (_userprofilepic == null)
+                      const CircleAvatar(
+                        radius: 70,
+                        backgroundColor: Color.fromARGB(255, 24, 115, 185),
+                        foregroundImage:
+                            AssetImage('assets/default_profile_picture.jpg'),
+                      )
+                    else if (_userprofilepic != null)
                       CircleAvatar(
-                        foregroundImage: NetworkImage(_userprofilepic!),
+                        backgroundColor:
+                            const Color.fromARGB(255, 24, 115, 185),
+                        foregroundImage:
+                            CachedNetworkImageProvider(_userprofilepic!),
                         radius: 80.0,
                       ),
                   ],
@@ -84,13 +95,13 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
                   onPressed: () => selectedItem(context, 0)),
               const SizedBox(height: 10.0),
               buildMenuItem(
-                  text: 'Notifications',
-                  icon: Icons.notifications,
+                  text: 'Add new Article',
+                  icon: Icons.add,
                   onPressed: () => selectedItem(context, 1)),
               const SizedBox(height: 10.0),
               buildMenuItem(
-                  text: 'Messages',
-                  icon: Icons.message,
+                  text: 'Article List',
+                  icon: Icons.menu,
                   onPressed: () => selectedItem(context, 2)),
               const Divider(height: 40.0, color: Colors.white, thickness: 0.8),
               buildMenuItem(
@@ -140,22 +151,28 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => ProfileSettings(userPic: _userprofilepic!),
+          builder: (context) => ProfileSettings(
+              userEmail: _email!,
+              userLastName: _userlastname!,
+              userName: _username!,
+              userPic: _userprofilepic!),
         ));
         break;
       case 1:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const ConnectWithPhone(),
+          builder: (context) => const AddNewProfile(),
         ));
         break;
       case 2:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => MessagesPage(userPic: _userprofilepic!),
+          builder: (context) => const MyProfileList(),
         ));
         break;
       case 3:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const UserSettings(),
+          builder: (context) => UserSettings(
+            profilePic: _userprofilepic!,
+          ),
         ));
         break;
       case 4:

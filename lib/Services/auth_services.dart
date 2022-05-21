@@ -14,7 +14,7 @@ class Authentication {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) => Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomePage())));
+              MaterialPageRoute(builder: (context) => const MyHomePage())));
     } on FirebaseAuthException catch (error) {
       if (error.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(

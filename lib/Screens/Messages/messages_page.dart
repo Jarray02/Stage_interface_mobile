@@ -29,8 +29,10 @@ class MessagesPage extends StatelessWidget {
           title: const Text('Messages'),
           leading: IconButton(
               onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const HomePage()));
+                Navigator.pop(context);
+                //TODO : TEST
+                // Navigator.of(context).push(MaterialPageRoute(
+                //     builder: (context) => const MyHomePage()));
               },
               icon: const Icon(Icons.arrow_back)),
           actions: [
@@ -94,21 +96,26 @@ class SearchBar extends SearchDelegate<String> {
 
   UserData? userData;
 
-  final userList = [];
+  List userList = [];
 
   Future<void> onSearch() async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-    await _firestore
-        .collection('users')
-        .where("name ", isEqualTo: query)
-        .get()
-        .then((value) {
-      userMap = value.docs[0].data();
+    DatabaseReference _ref = FirebaseDatabase.instance.ref();
+    await _ref.child('Users').equalTo("name").get().then((value) {
+      userList = value.children.toList();
+      debugPrint(userList.toString());
     });
-    debugPrint(userMap.toString());
-    return userMap
-        .forEach((username, userpicture) => userList.add(userData?.userName));
+
+    // await _firestore
+    //     .collection('users')
+    //     .where("name ", isEqualTo: query)
+    //     .get()<
+    //     .then((value) {
+    //   userMap = value.docs[0].data();
+    // });
+    // debugPrint(userMap.toString());
+    // return userMap
+    //     .forEach((username, userpicture) => userList.add(userData?.userName));
   }
 
   @override
@@ -149,8 +156,15 @@ class SearchBar extends SearchDelegate<String> {
     return ListView.builder(
         itemCount: suggestionList.length,
         itemBuilder: (context, index) => ListTile(
-              onTap: () => showResults(context),
-              title: Text(suggestionList[index]),
+              onTap: () async {
+                showResults(context);
+                DatabaseReference _ref = FirebaseDatabase.instance.ref();
+                await _ref.child('Users').get().then((value) {
+                  userList = value.children.map((e) => e as String).toList();
+                  print(userList.toString());
+                });
+              },
+              title: Text(userList[index]),
               leading: const Icon(Icons.person),
             ));
   }

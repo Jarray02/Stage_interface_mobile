@@ -16,7 +16,7 @@ class UserData {
   factory UserData.fromRTDB(Map<String, dynamic> data) {
     return UserData(
         userName: data['name'],
-        userLastName: data['lasname'],
+        userLastName: data['lastName'],
         userEmail: data['email'],
         userProfilePicture: data['photoURL']);
   }

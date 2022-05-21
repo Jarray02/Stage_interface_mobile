@@ -3,9 +3,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:first_flutter_project/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animation_progress_bar/flutter_animation_progress_bar.dart';
-import '../Custm_Widgets/navigation_drawer_widget.dart';
+import '../Custm_Widgets/custm_widgets.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import 'screens.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -27,10 +29,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final DatabaseReference _ref = FirebaseDatabase.instance.ref().child('Data');
+  final DatabaseReference _profileRef =
+      FirebaseDatabase.instance.ref().child('profile');
   final PageController _pageController = PageController(initialPage: 0);
-  double _temperature = 0, _humidite = 0, _pression = 0;
-  String _profile = '1';
+  num _temperature = 0, _humidite = 0, _pression = 0;
+  String _profile = 'banane';
   int _currentPageIndex = 0;
+  String _currentIcon = '';
+  bool barIsSelected = true;
+  List _profileList = [];
+  @override
+  void initState() {
+    super.initState();
+    fetchProfileList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +50,19 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         endDrawer: const NavigationDrawerWidget(),
         appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: const Text('Home Page'),
+          iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: const Color.fromARGB(255, 24, 115, 185),
+          title: const Text(
+            'Home Page',
+            style: TextStyle(color: Colors.white),
+          ),
           elevation: 5.0,
         ),
         bottomNavigationBar: BottomNavigationBar(
+          key: const Key("bottomNavigationBar"),
+          backgroundColor: const Color.fromARGB(255, 24, 115, 185),
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Theme.of(context).primaryColor,
+          selectedItemColor: Colors.white,
           unselectedItemColor: Colors.grey[500],
           currentIndex: _currentPageIndex,
           items: const [
@@ -69,14 +87,13 @@ class _HomePageState extends State<HomePage> {
   Widget _pageViewWidget() {
     return StreamBuilder<Object>(builder: (context, snapshot) {
       _ref.onValue.listen((event) {
-        var dataMap =
-            Map<String, dynamic>.from(event.snapshot.value as LinkedHashMap);
-        SensorData sensorData = SensorData.fromRTDB(dataMap);
+        List sensorData = event.snapshot.children.map((e) => e.value).toList();
+        fetchMatchedProfileIcon();
         setState(() {
-          _temperature = sensorData.temperature;
-          _humidite = sensorData.humidite;
-          _profile = sensorData.profile;
-          _pression = sensorData.pression;
+          _profile = sensorData[0];
+          _humidite = sensorData[1];
+          _pression = sensorData[2];
+          _temperature = sensorData[3];
         });
       });
       return PageView(
@@ -98,15 +115,49 @@ class _HomePageState extends State<HomePage> {
   Widget _profileWidget(String profile) {
     return Center(
       child: Column(children: [
-        // const Icon(Icons.person, color: Colors.blue, size: 100),
-        // Text('The current profile is $profile'),
-        // const SizedBox(height: 50.0),
-        profilSelector(),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Column(children: [
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const ProfileDetailHomePage()));
+                      },
+                      child: Hero(
+                        tag: "ProfilePic",
+                        child: Image(
+                          image: NetworkImage(_currentIcon),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Text('The current profile is $_profile'),
+                const SizedBox(height: 50),
+                profilSelector(),
+                const SizedBox(height: 20),
+                const Text(
+                  'Tap on icon to select the profile',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                )
+              ]),
+            ),
+          ],
+        ),
       ]),
     );
   }
 
-  Widget _temperatureWidget(double temperature) {
+  Widget _temperatureWidget(num temperature) {
     return Center(
       child: Column(
         children: [
@@ -119,19 +170,23 @@ class _HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: FAProgressBar(
-                progressColor: Colors.blue,
-                direction: Axis.vertical,
-                verticalDirection: VerticalDirection.up,
-                size: 100,
-                currentValue: double.parse(temperature.toStringAsFixed(2)),
-                changeProgressColor: Colors.red,
-                maxValue: 100,
-                displayText: '°C',
-                borderRadius: BorderRadius.circular(16),
-                animatedDuration: const Duration(milliseconds: 500),
-              ),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+              child: barIsSelected
+                  ? FAProgressBar(
+                      progressColor: Colors.blue,
+                      direction: Axis.vertical,
+                      verticalDirection: VerticalDirection.up,
+                      size: 100,
+                      currentValue:
+                          double.parse(temperature.toStringAsFixed(2)),
+                      changeProgressColor: Colors.red,
+                      maxValue: 100,
+                      displayText: '°C',
+                      borderRadius: BorderRadius.circular(16),
+                      animatedDuration: const Duration(milliseconds: 500),
+                    )
+                  : const TempChart(value: 'temperature'),
             ),
           ),
           Container(
@@ -140,13 +195,14 @@ class _HomePageState extends State<HomePage> {
               '$temperature °C',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
             ),
-          )
+          ),
+          slectedView(),
         ],
       ),
     );
   }
 
-  Widget _pressureWidget(double pressure) {
+  Widget _pressureWidget(num pressure) {
     return Center(
       child: Column(
         children: [
@@ -160,18 +216,20 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: FAProgressBar(
-                progressColor: Colors.blue,
-                direction: Axis.vertical,
-                verticalDirection: VerticalDirection.up,
-                size: 100,
-                currentValue: double.parse(pressure.toStringAsFixed(2)),
-                changeProgressColor: Colors.red,
-                maxValue: 50000,
-                displayText: '°C',
-                borderRadius: BorderRadius.circular(16),
-                animatedDuration: const Duration(milliseconds: 500),
-              ),
+              child: barIsSelected
+                  ? FAProgressBar(
+                      progressColor: Colors.blue,
+                      direction: Axis.vertical,
+                      verticalDirection: VerticalDirection.up,
+                      size: 100,
+                      currentValue: double.parse(pressure.toStringAsFixed(2)),
+                      changeProgressColor: Colors.red,
+                      maxValue: 5000,
+                      displayText: '°C',
+                      borderRadius: BorderRadius.circular(16),
+                      animatedDuration: const Duration(milliseconds: 500),
+                    )
+                  : const TempChart(value: 'pression'),
             ),
           ),
           Container(
@@ -180,13 +238,14 @@ class _HomePageState extends State<HomePage> {
               '$pressure mPa',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
             ),
-          )
+          ),
+          slectedView(),
         ],
       ),
     );
   }
 
-  Widget _humidityWidget(double humidity) {
+  Widget _humidityWidget(num humidity) {
     return Center(
       child: Column(
         children: [
@@ -199,126 +258,220 @@ class _HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 80.0, horizontal: 50),
-              child: LiquidCircularProgressIndicator(
-                value: humidity / 100, // Defaults to 0.5.
-                valueColor: const AlwaysStoppedAnimation(Colors
-                    .blue), // Defaults to the current Theme's accentColor.
-                backgroundColor: Colors
-                    .white, // Defaults to the current Theme's backgroundColor.
-                borderColor: Colors.blue,
-                borderWidth: 3.0,
-                direction: Axis
-                    .vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.horizontal.
-                center: const Text("%",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: SizedBox(
+                width: 300,
+                height: 300,
+                child: barIsSelected
+                    ? LiquidCircularProgressIndicator(
+                        value: humidity / 100,
+                        valueColor: const AlwaysStoppedAnimation(Colors.blue),
+                        backgroundColor: Colors.white,
+                        borderColor: Colors.blue,
+                        borderWidth: 3.0,
+                        direction: Axis.vertical,
+                        center: Text(
+                          "%",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                              color: Colors.black.withOpacity(0.8)),
+                        ),
+                      )
+                    : const TempChart(
+                        value: 'humidite',
+                      ),
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.only(bottom: 40),
+            padding: const EdgeInsets.only(bottom: 27),
             child: Text(
               '$humidity %',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
             ),
-          )
+          ),
+          slectedView(),
         ],
       ),
     );
   }
 
   Widget profilSelector() {
-    Profile banane = Profile(
-        name: 'Banane',
-        id: 1,
-        icon: const AssetImage('assets/banane.webp'),
-        maxTemp: 20,
-        maxHumid: 50);
-    Profile algue = Profile(
-        name: 'Algue',
-        id: 2,
-        icon: const AssetImage('assets/algue.png'),
-        maxTemp: 50,
-        maxHumid: 30);
-    Profile apple = Profile(
-        name: 'Apple',
-        id: 3,
-        icon: const AssetImage('assets/apple.png'),
-        maxTemp: 20,
-        maxHumid: 50);
-    Profile orange = Profile(
-        name: 'Orange',
-        id: 1,
-        icon: const AssetImage('assets/orange.png'),
-        maxTemp: 20,
-        maxHumid: 50);
-    List<Profile> profileList = [banane, algue, apple, orange];
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.8,
-      height: 200,
-      child: Stack(
+    int currentIndex = 0;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            if (currentIndex != 0) {
+              setState(() {
+                currentIndex--;
+              });
+            }
+          },
+        ),
+        SizedBox(
+          height: 300,
+          width: MediaQuery.of(context).size.width * 0.6,
+          child: Stack(
+            children: [
+              VxAnimatedBox().size(50, 50).make(),
+              VxSwiper.builder(
+                  itemCount: _profileList.length,
+                  aspectRatio: 1.0,
+                  enlargeCenterPage: true,
+                  itemBuilder: (context, index) {
+                    final prof = _profileList[index];
+                    currentIndex = index;
+                    return VxBox(
+                            child: ZStack(
+                      [
+                        Positioned(
+                          top: 0.0,
+                          right: 0.0,
+                          child: VxBox(
+                                  // child: prof.maxTemp.text.uppercase.white
+                                  // .make()
+                                  // .px16(),
+                                  )
+                              .height(40)
+                              .black
+                              .alignCenter
+                              .withRounded(value: 16.0)
+                              .make(),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: VStack(
+                            [
+                              // prof.name.text.xl3.white.bold.make(),
+                              5.heightBox,
+                              // prof.maxTemp.text.sm.white.semiBold.make(),
+                            ],
+                            crossAlignment: CrossAxisAlignment.center,
+                          ),
+                        ),
+                        const Align(
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.play_arrow_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ))
+                        .clip(Clip.antiAlias)
+                        .bgImage(DecorationImage(
+                            image: NetworkImage(prof["icon"]),
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(
+                                Colors.black.withOpacity(0.3),
+                                BlendMode.darken)))
+                        .border(color: Colors.black, width: 5)
+                        .withRounded(value: 60.0)
+                        .make()
+                        .onInkTap(() async {
+                      await _ref.update({
+                        "currentProfile": prof['name'].toString().toLowerCase()
+                      });
+                    }).p16();
+                  }).centered(),
+            ],
+            fit: StackFit.expand,
+          ),
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            if (currentIndex != 3) {
+              setState(() {
+                currentIndex++;
+              });
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget slectedView() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          VxAnimatedBox().size(50, 50).make(),
-          VxSwiper.builder(
-              itemCount: profileList.length,
-              aspectRatio: 1.0,
-              enlargeCenterPage: true,
-              itemBuilder: (context, index) {
-                final prof = profileList[index];
-                return VxBox(
-                        child: ZStack(
-                  [
-                    Positioned(
-                      top: 0.0,
-                      right: 0.0,
-                      child: VxBox(
-                        child: prof.maxTemp.text.uppercase.white.make().px16(),
-                      )
-                          .height(40)
-                          .black
-                          .alignCenter
-                          .withRounded(value: 16.0)
-                          .make(),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: VStack(
-                        [
-                          prof.name.text.xl3.white.bold.make(),
-                          5.heightBox,
-                          prof.maxTemp.text.sm.white.semiBold.make(),
-                        ],
-                        crossAlignment: CrossAxisAlignment.center,
-                      ),
-                    ),
-                    const Align(
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        color: Colors.white,
-                      ),
-                    ),
-                    10.heightBox,
-                    "Tap to change current profile".text.gray300.make(),
-                  ],
-                ))
-                    .clip(Clip.antiAlias)
-                    .bgImage(DecorationImage(
-                        image: prof.icon,
-                        fit: BoxFit.fill,
-                        colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.3), BlendMode.darken)))
-                    .border(color: Colors.black, width: 0.5)
-                    .withRounded(value: 60.0)
-                    .make()
-                    .onInkTap(() {})
-                    .p16();
-              }).centered(),
+          OutlinedButton(
+            onPressed: () {
+              if (!barIsSelected) {
+                setState(() {
+                  barIsSelected = true;
+                });
+              }
+            },
+            style: ButtonStyle(
+                backgroundColor: barIsSelected
+                    ? MaterialStateProperty.all<Color>(Colors.blue)
+                    : MaterialStateProperty.all<Color>(Colors.white)),
+            child: Text(
+              'Bar',
+              style:
+                  TextStyle(color: barIsSelected ? Colors.white : Colors.blue),
+            ),
+          ),
+          const SizedBox(width: 5),
+          OutlinedButton(
+            onPressed: () {
+              if (barIsSelected) {
+                setState(() {
+                  barIsSelected = false;
+                });
+              }
+            },
+            child: Text(
+              'Graphe',
+              style:
+                  TextStyle(color: barIsSelected ? Colors.blue : Colors.white),
+            ),
+            style: ButtonStyle(
+                backgroundColor: barIsSelected
+                    ? MaterialStateProperty.all<Color>(Colors.white)
+                    : MaterialStateProperty.all<Color>(Colors.blue)),
+          ),
         ],
-        fit: StackFit.expand,
       ),
     );
+  }
+
+  Future<List<Object?>> fetchProfileList() async {
+    var _list = await _profileRef
+        .get()
+        .then((value) => value.children.map((e) => e.value).toList());
+    setState(() {
+      _profileList = _list;
+    });
+    return _profileList;
+  }
+
+  fetchMatchedProfileIcon() async {
+    var currentIcon;
+    var _currentProfile =
+        await _ref.child('currentProfile').get().then((value) => value.value);
+    List<dynamic> _profileListKeys = await _profileRef
+        .get()
+        .then((value) => value.children.map((e) => e.value).toList());
+    _profileListKeys.forEach((element) {
+      if (element['name'].toString().toLowerCase() == _currentProfile) {
+        currentIcon = element['icon'];
+      }
+    });
+    setState(() {
+      _currentIcon = currentIcon;
+    });
   }
 }

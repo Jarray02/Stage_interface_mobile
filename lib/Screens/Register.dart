@@ -1,39 +1,25 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:first_flutter_project/Services/firestore_services.dart';
 import 'package:first_flutter_project/Services/services.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../models/models.dart';
 import 'screens.dart';
 import '../Custm_Widgets/verify_email_alert.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return const SafeArea(child: MyRegisterPage());
-  }
+  State<Register> createState() => _MyRegisterPageState();
 }
 
-class MyRegisterPage extends StatefulWidget {
-  const MyRegisterPage({Key? key}) : super(key: key);
-
-  @override
-  State<MyRegisterPage> createState() => _MyRegisterPageState();
-}
-
-class _MyRegisterPageState extends State<MyRegisterPage> {
+class _MyRegisterPageState extends State<Register> {
   final Authentication _auth = Authentication();
   final DatabaseReference _ref = FirebaseDatabase.instance.ref().child('Users');
-  final Storage _photostorage = Storage();
-  final UserDataStorage _storage = UserDataStorage();
   final _emailtext = TextEditingController();
   final _passwordtext = TextEditingController();
   final _nametext = TextEditingController();
@@ -51,7 +37,8 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
     String description =
         'A Verification Email Has been sent! Please check your inbox';
     return _isLoading
-        ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+        ? const SafeArea(
+            child: Scaffold(body: Center(child: CircularProgressIndicator())))
         : SafeArea(
             child: Scaffold(
               body: SingleChildScrollView(
@@ -60,36 +47,47 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
                     Center(
                       child: Container(
                         padding: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 0),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             if (pickedFile == null)
-                              const CircleAvatar(
-                                backgroundImage: AssetImage(
+                              CircleAvatar(
+                                backgroundImage: const AssetImage(
                                     'assets/default_profile_picture.jpg'),
                                 radius: 70.0,
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: FloatingActionButton.extended(
+                                      elevation: 0.0,
+                                      backgroundColor: Colors.transparent,
+                                      onPressed: () async {
+                                        selecFile();
+                                      },
+                                      label: const Icon(Icons.camera_alt)),
+                                ),
                               ),
                             if (pickedFile != null)
-                              Flexible(
-                                child: Container(
-                                    width: 150,
-                                    height: 150,
-                                    color: Colors.blue[100],
-                                    child: Image.file(File(pickedFile!.path!))),
+                              CircleAvatar(
+                                backgroundImage:
+                                    Image.file(File(pickedFile!.path!)).image,
+                                backgroundColor: Colors.transparent,
+                                radius: 70,
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: FloatingActionButton.extended(
+                                      elevation: 0.0,
+                                      backgroundColor: Colors.transparent,
+                                      onPressed: () async {
+                                        selecFile();
+                                      },
+                                      label: const Icon(Icons.camera_alt)),
+                                ),
                               ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: FloatingActionButton(
-                                  backgroundColor: Colors.transparent,
-                                  onPressed: () async {
-                                    await selecFile();
-                                  },
-                                  elevation: 0.0,
-                                  mini: true,
-                                  child: const Icon(Icons.camera_alt)),
-                            ),
-                            const Divider(height: 45.0),
+                            const Divider(height: 25.0),
                             const Text(
                               'Register',
                               style: TextStyle(
@@ -200,7 +198,8 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
                                       _emailtext.text.trim(),
                                       _nametext.text.trim(),
                                       _lastnametext.text.trim(),
-                                      _passwordtext.text.trim())) {
+                                      _passwordtext.text.trim(),
+                                      pickedFile)) {
                                     setState(() {
                                       _isLoading = true;
                                     });
@@ -265,22 +264,26 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
   }
 
   bool _verifyTextField(BuildContext context, String? email, String? name,
-      String? lastname, String? password) {
-    if (email == null) {
+      String? lastname, String? password, PlatformFile? file) {
+    if (email!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please put a valid email')));
       return false;
-    } else if (name == null) {
+    } else if (name!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please put a valid name')));
       return false;
-    } else if (lastname == null) {
+    } else if (lastname!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please put a valid last name')));
       return false;
-    } else if (password == null || password.length < 6) {
+    } else if (password!.isEmpty || password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please put a valid password')));
+      return false;
+    } else if (file == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('please select an image')));
       return false;
     } else {
       return true;
@@ -288,9 +291,8 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
   }
 
   Future selecFile() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    final result = await FilePicker.platform.pickFiles();
     if (result == null) return;
-
     setState(() {
       pickedFile = result.files.first;
     });
@@ -327,33 +329,4 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
       debugPrint(error.toString());
     }
   }
-
-  // Future<String?> _uploadProfileImage() async {
-  //   String? url;
-  //   final result = await ImagePicker().pickImage(
-  //     imageQuality: 70,
-  //     maxWidth: 1440,
-  //     source: ImageSource.gallery,
-  //   );
-  //   if (result != null) {
-  //     await _photostorage
-  //         .uploadProfileImage(result.path, result.name)
-  //         .then((value) {
-  //       url = value;
-  //     });
-  //   }
-  //   return url;
-  // }
-
-  // Future<String?> _getDefaultProfilePicture() async {
-  //   String? url;
-  //   try {
-  //     url = await storage
-  //         .ref('/profile_images/default_profile_picture.jpg')
-  //         .getDownloadURL();
-  //   } on firebase_storage.FirebaseException catch (error) {
-  //     debugPrint('error uploading profile picture ${error.toString()}');
-  //   }
-  //   return url;
-  // }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class ProfileList {
   final List<Profile> profileList;
@@ -86,7 +87,6 @@ class Profile {
     return <String, dynamic>{
       'name': name,
       'id': id,
-      'icon': icon,
       'maxTemp': maxTemp,
       'maxHumid': maxHumid,
     };

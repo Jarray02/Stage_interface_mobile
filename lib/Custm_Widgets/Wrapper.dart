@@ -1,6 +1,6 @@
+import 'package:first_flutter_project/Screens/connect_with_email.dart';
+import 'package:first_flutter_project/Screens/home_page.dart';
 import 'package:flutter/material.dart';
-import '../Screens/home_page.dart';
-import '../Screens/welcome_page.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -12,9 +12,9 @@ class Wrapper extends StatelessWidget {
     final user = Provider.of<User?>(context);
 
     if ((user == null) || (!user.emailVerified)) {
-      return const WelcomePage();
+      return const ConnectWithEmail();
     } else {
-      return const HomePage();
+      return const MyHomePage();
     }
   }
 }

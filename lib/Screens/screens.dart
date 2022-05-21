@@ -9,3 +9,7 @@ export 'connect_with_phone.dart';
 export 'home_page.dart';
 export 'register.dart';
 export 'welcome_page.dart';
+export 'add_new_profile.dart';
+export 'profile_detail_page_from_home.dart';
+export 'profile_detail_form_list.dart';
+export 'profile_list.dart';

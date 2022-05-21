@@ -1,7 +1,13 @@
-export 'custm_circular_progress_indicator.dart';
 export 'custm_search_bar.dart';
 export 'verify_email_alert.dart';
 export 'verify_phone_alert.dart';
 export 'navigation_drawer_widget.dart';
 export 'wrapper.dart';
 export 'avatar.dart';
+export 'temp_chart_portrait.dart';
+export 'responsive.dart';
+export 'home Page Widgets/current_profile_widget.dart';
+export 'home Page Widgets/humid_widget.dart';
+export 'home Page Widgets/pressure_widget.dart';
+export 'home Page Widgets/profile_selector.dart';
+export 'home Page Widgets/temp_widget.dart';
