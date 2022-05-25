@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../Services/services.dart';
 import '../screens.dart';
@@ -23,6 +25,8 @@ class ProfileSettings extends StatefulWidget {
 
 class _MyProfileSettingsState extends State<ProfileSettings> {
   final Authentication _auth = Authentication();
+  final auth = FirebaseAuth.instance;
+  final DatabaseReference _ref = FirebaseDatabase.instance.ref().child('Users');
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -102,9 +106,10 @@ class _MyProfileSettingsState extends State<ProfileSettings> {
                 const Divider(color: Colors.blue, height: 2.0),
                 TextButton(
                     onPressed: () async {
+                      await _ref.child(auth.currentUser!.uid).remove();
                       await _auth.deleteUserAccount(context).then((value) {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => const WelcomePage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ConnectWithEmail()));
                       });
                     },
                     child: const Text('Delete your account')),

@@ -38,6 +38,12 @@ class _CurrentProfileWidgetState extends State<CurrentProfileWidget> {
   }
 
   @override
+  void dispose() {
+    fetchProfile();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

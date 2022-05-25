@@ -14,7 +14,7 @@ class Wrapper extends StatelessWidget {
     if ((user == null) || (!user.emailVerified)) {
       return const ConnectWithEmail();
     } else {
-      return const MyHomePage();
+      return const HomePage();
     }
   }
 }

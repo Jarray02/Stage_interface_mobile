@@ -22,6 +22,12 @@ class _MyProfileListState extends State<MyProfileList> {
   }
 
   @override
+  void dispose() {
+    _fetchProfileList();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -35,10 +41,6 @@ class _MyProfileListState extends State<MyProfileList> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
-            // onPressed: () => Navigator.of(context).pushReplacement(
-            //   MaterialPageRoute(
-            //     builder: (context) => const HomePage(),
-            //   ),
           ),
         ),
         body: ListView.builder(
@@ -142,9 +144,11 @@ class _MyProfileListState extends State<MyProfileList> {
     var prof = await _profileRef
         .get()
         .then((value) => value.children.map((e) => e.value).toList());
-    setState(() {
-      _profileList = prof;
-    });
+    if (mounted) {
+      setState(() {
+        _profileList = prof;
+      });
+    }
 
     return _profileList;
   }

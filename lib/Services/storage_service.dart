@@ -22,9 +22,9 @@ class Storage {
     firebase_storage.ListResult results =
         await storage.ref('/profile_images').listAll();
 
-    results.items.forEach((firebase_storage.Reference ref) {
+    for (var ref in results.items) {
       debugPrint('Found file : $ref');
-    });
+    }
     return results;
   }
 }

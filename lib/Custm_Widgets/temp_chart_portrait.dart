@@ -34,6 +34,7 @@ class _MyTempChartState extends State<TempChart> {
   void dispose() {
     timer1?.cancel();
     timer2?.cancel();
+    selectInterval();
     super.dispose();
   }
 

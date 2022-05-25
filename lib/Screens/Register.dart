@@ -246,7 +246,7 @@ class _MyRegisterPageState extends State<Register> {
                           dispose();
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
-                              builder: (context) => const WelcomePage(),
+                              builder: (context) => const ConnectWithEmail(),
                             ),
                           );
                         },

@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:first_flutter_project/Screens/Settings/update_email.dart';
 import 'package:first_flutter_project/Screens/Settings/update_password.dart';
-import 'package:first_flutter_project/Screens/home_page.dart';
-import 'package:first_flutter_project/Screens/welcome_page.dart';
+import 'package:first_flutter_project/Screens/connect_with_email.dart';
 import 'package:first_flutter_project/Services/auth_services.dart';
 import 'package:flutter/material.dart';
 
@@ -24,9 +23,6 @@ class _MySettingsState extends State<UserSettings> {
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
-                //TODO : TEST
-                // Navigator.of(context).pushReplacement(MaterialPageRoute(
-                //     builder: (context) => const MyHomePage()));
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -61,13 +57,19 @@ class _MySettingsState extends State<UserSettings> {
                     const Icon(Icons.email, color: Colors.blue),
                     const SizedBox(width: 2.0),
                     TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const UpdateEmail()));
-                        },
-                        child: const Text('Update your email',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontSize: 20.0))),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const UpdateEmail(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Update your email',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                    ),
                   ],
                 ),
                 const Divider(height: 3.0, color: Colors.blue),
@@ -76,13 +78,19 @@ class _MySettingsState extends State<UserSettings> {
                     const Icon(Icons.lock, color: Colors.blue),
                     const SizedBox(width: 2.0),
                     TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const UpdatePassword()));
-                        },
-                        child: const Text('Update your password',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontSize: 20.0))),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const UpdatePassword(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Update your password',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                    ),
                   ],
                 ),
                 const Divider(height: 3.0, color: Colors.blue),
@@ -91,45 +99,57 @@ class _MySettingsState extends State<UserSettings> {
                     const Icon(Icons.delete, color: Colors.blue),
                     const SizedBox(width: 2.0),
                     TextButton(
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: const Text('Are you sure?'),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text('Yes'),
-                                        onPressed: () async {
-                                          _auth
-                                              .deleteUserAccount(context)
-                                              .then((_) {
-                                            Navigator.of(context).pushReplacement(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const WelcomePage()));
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(const SnackBar(
-                                                    content: Text(
-                                                        'Account deleted successfully')));
-                                          });
-                                        },
-                                      ),
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('Cancel'))
-                                    ],
-                                  ));
-                        },
-                        child: const Text('Delete your account',
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontSize: 20.0))),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: const Text('Are you sure?'),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text('Yes'),
+                                      onPressed: () async {
+                                        _auth
+                                            .deleteUserAccount(context)
+                                            .then((_) {
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ConnectWithEmail(),
+                                            ),
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Account deleted successfully'),
+                                            ),
+                                          );
+                                        });
+                                      },
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                  ],
+                                ));
+                      },
+                      child: const Text(
+                        'Delete your account',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 Center(
-                    child: Image.asset('assets/settings.gif',
-                        width: 250.0, height: 250.0)),
+                  child: Image.asset('assets/settings.gif',
+                      width: 250.0, height: 250.0),
+                ),
               ]),
         ),
       ),

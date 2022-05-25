@@ -30,9 +30,6 @@ class MessagesPage extends StatelessWidget {
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
-                //TODO : TEST
-                // Navigator.of(context).push(MaterialPageRoute(
-                //     builder: (context) => const MyHomePage()));
               },
               icon: const Icon(Icons.arrow_back)),
           actions: [

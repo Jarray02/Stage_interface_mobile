@@ -1,5 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:first_flutter_project/Screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:async';
@@ -43,6 +42,7 @@ class _MyTempChartState extends State<TempChartLandscape> {
   void dispose() {
     timer1?.cancel();
     timer2?.cancel();
+    selectInterval();
     super.dispose();
   }
 

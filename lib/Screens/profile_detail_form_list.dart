@@ -1,4 +1,3 @@
-import 'package:first_flutter_project/Screens/home_page.dart';
 import 'package:flutter/material.dart';
 
 class ProfileDetailFromList extends StatelessWidget {
@@ -6,7 +5,7 @@ class ProfileDetailFromList extends StatelessWidget {
     Key? key,
     required this.prof,
   }) : super(key: key);
-  final prof;
+  final dynamic prof;
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -58,7 +58,7 @@ class _MyCustmAlertDialogState extends State<CustmAlertDialog> {
         child: dialogContent(context),
       );
     } else {
-      return const MyHomePage();
+      return const HomePage();
     }
   }
 

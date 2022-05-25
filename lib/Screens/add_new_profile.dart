@@ -40,9 +40,6 @@ class _AddNewProfileState extends State<AddNewProfile> {
           backgroundColor: const Color.fromARGB(255, 24, 115, 185),
           leading: IconButton(
             onPressed: () {
-              //TODO: TEST
-              // Navigator.of(context).pushReplacement(
-              //     MaterialPageRoute(builder: (context) => const MyHomePage()));
               Navigator.pop(context);
             },
             icon: const Icon(
@@ -219,11 +216,12 @@ class _AddNewProfileState extends State<AddNewProfile> {
                                             'assets/banane.png'),
                                       );
                                       await _uploadNewProfile(_newProfileData)
-                                          .then((value) => Navigator.of(context)
-                                              .pushReplacement(
+                                          .then((value) =>
+                                              Navigator.pushReplacement(
+                                                  context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          const MyHomePage())));
+                                                          const HomePage())));
                                     }
                                   }),
                               const SizedBox(height: 20.0),

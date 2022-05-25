@@ -7,17 +7,6 @@ import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const SafeArea(
-      child: HomePage(),
-    );
-  }
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -38,10 +27,19 @@ class _HomePageState extends State<HomePage> {
   String _currentIcon = '';
   bool barIsSelected = true;
   List _profileList = [];
+
   @override
   void initState() {
     super.initState();
     fetchProfileList();
+    fetchMatchedProfileIcon();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    fetchProfileList();
+    fetchMatchedProfileIcon();
   }
 
   @override
@@ -79,37 +77,34 @@ class _HomePageState extends State<HomePage> {
                 curve: Curves.linear);
           },
         ),
-        body: _pageViewWidget(),
+        body: StreamBuilder<Object>(builder: (context, snapshot) {
+          _ref.onValue.listen((event) async {
+            List sensorData =
+                event.snapshot.children.map((e) => e.value).toList();
+            setState(() {
+              _profile = sensorData[0];
+              _humidite = sensorData[1];
+              _pression = sensorData[2];
+              _temperature = sensorData[3];
+            });
+          });
+          return PageView(
+            key: const Key('pageView'),
+            controller: _pageController,
+            onPageChanged: (newIndex) {
+              _currentPageIndex = newIndex;
+            },
+            scrollDirection: Axis.horizontal,
+            children: [
+              _temperatureWidget(_temperature),
+              _humidityWidget(_humidite),
+              _pressureWidget(_pression),
+              _profileWidget(_profile),
+            ],
+          );
+        }),
       ),
     );
-  }
-
-  Widget _pageViewWidget() {
-    return StreamBuilder<Object>(builder: (context, snapshot) {
-      _ref.onValue.listen((event) {
-        List sensorData = event.snapshot.children.map((e) => e.value).toList();
-        fetchMatchedProfileIcon();
-        setState(() {
-          _profile = sensorData[0];
-          _humidite = sensorData[1];
-          _pression = sensorData[2];
-          _temperature = sensorData[3];
-        });
-      });
-      return PageView(
-        controller: _pageController,
-        onPageChanged: (newIndex) {
-          _currentPageIndex = newIndex;
-        },
-        scrollDirection: Axis.horizontal,
-        children: [
-          _temperatureWidget(_temperature),
-          _humidityWidget(_humidite),
-          _pressureWidget(_pression),
-          _profileWidget(_profile),
-        ],
-      );
-    });
   }
 
   Widget _profileWidget(String profile) {
@@ -123,12 +118,24 @@ class _HomePageState extends State<HomePage> {
               child: Column(children: [
                 const SizedBox(height: 20),
                 SizedBox(
-                  width: 150,
-                  height: 150,
-                  child: Image(
-                    image: NetworkImage(_currentIcon),
-                  ),
-                ),
+                    width: 150,
+                    height: 150,
+                    child: Image.network(
+                      _currentIcon,
+                      loadingBuilder: ((context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      }),
+                    )),
                 Text('The current profile is $_profile'),
                 const SizedBox(height: 50),
                 profilSelector(),
@@ -391,8 +398,8 @@ class _HomePageState extends State<HomePage> {
         AnimatedSmoothIndicator(
           activeIndex: currentIndex,
           count: _profileList.length,
-          effect: const ExpandingDotsEffect(
-              activeDotColor: Color.fromARGB(255, 24, 115, 185)),
+          effect: ExpandingDotsEffect(
+              activeDotColor: Colors.blue, dotColor: Colors.grey.shade300),
         )
       ],
     );
@@ -450,9 +457,8 @@ class _HomePageState extends State<HomePage> {
     var _list = await _profileRef
         .get()
         .then((value) => value.children.map((e) => e.value).toList());
-    setState(() {
-      _profileList = _list;
-    });
+    _profileList = _list;
+
     return _profileList;
   }
 
@@ -463,13 +469,11 @@ class _HomePageState extends State<HomePage> {
     List<dynamic> _profileListKeys = await _profileRef
         .get()
         .then((value) => value.children.map((e) => e.value).toList());
-    _profileListKeys.forEach((element) {
+    for (var element in _profileListKeys) {
       if (element['name'].toString().toLowerCase() == _currentProfile) {
         currentIcon = element['icon'];
       }
-    });
-    setState(() {
-      _currentIcon = currentIcon;
-    });
+    }
+    _currentIcon = currentIcon;
   }
 }

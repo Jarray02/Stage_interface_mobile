@@ -22,23 +22,34 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
 
   getUserPicture() async {
     final event = await _ref
-        .child('Users/${_auth.currentUser!.uid}')
+        .child('Users/${_auth.currentUser?.uid}')
         .once(DatabaseEventType.value);
-    final data = event.snapshot.value;
-    var userDataMap = Map<String, dynamic>.from(data as LinkedHashMap);
 
-    final userdata = UserData.fromRTDB(userDataMap);
-    setState(() {
-      _email = userdata.userEmail;
-      _username = userdata.userName;
-      _userlastname = userdata.userLastName;
-      _userprofilepic = userdata.userProfilePicture;
-    });
+    if (_auth.currentUser != null) {
+      final data = event.snapshot.value;
+      Map<String, dynamic> userDataMap =
+          Map<String, dynamic>.from(data as LinkedHashMap);
+      final userdata = UserData.fromRTDB(userDataMap);
+      if (mounted) {
+        setState(() {
+          _email = userdata.userEmail;
+          _username = userdata.userName;
+          _userlastname = userdata.userLastName;
+          _userprofilepic = userdata.userProfilePicture;
+        });
+      }
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    getUserPicture();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
     getUserPicture();
   }
 
@@ -176,8 +187,9 @@ class _NavigationDrawerWidgetState extends State<NavigationDrawerWidget> {
         ));
         break;
       case 4:
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const WelcomePage()));
+        Navigator.pop(context);
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const ConnectWithEmail()));
         break;
     }
   }
