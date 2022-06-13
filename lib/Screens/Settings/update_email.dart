@@ -44,8 +44,10 @@ class _UpdateEmailState extends State<MyUpdateEmail> {
           title: const Text('Update your email'),
           centerTitle: true,
           leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop()),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          backgroundColor: const Color.fromARGB(255, 24, 115, 185),
         ),
         body: _isLoading
             ? const Center(

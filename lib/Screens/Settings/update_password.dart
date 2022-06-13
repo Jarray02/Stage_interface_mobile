@@ -34,6 +34,15 @@ class _MyUpdatePasswordState extends State<MyUpdatePassword> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text('update your password'),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          backgroundColor: const Color.fromARGB(255, 24, 115, 185),
+        ),
         body: SingleChildScrollView(
           child: Column(
             children: [

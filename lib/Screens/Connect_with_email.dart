@@ -122,11 +122,17 @@ class _MyEmailState extends State<ConnectWithEmail> {
                                           context,
                                           _emailtext.text.trim(),
                                           _passwordtext.text.trim())
-                                      .onError((error, stackTrace) =>
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  content:
-                                                      Text(error.toString()))));
+                                      .onError(
+                                        (error, stackTrace) =>
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              error.toString(),
+                                            ),
+                                          ),
+                                        ),
+                                      );
                                 }
                               },
                               child: const Text(

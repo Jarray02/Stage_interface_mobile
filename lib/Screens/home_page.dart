@@ -79,14 +79,18 @@ class _HomePageState extends State<HomePage> {
         ),
         body: StreamBuilder<Object>(builder: (context, snapshot) {
           _ref.onValue.listen((event) async {
+            fetchMatchedProfileIcon();
             List sensorData =
                 event.snapshot.children.map((e) => e.value).toList();
-            setState(() {
-              _profile = sensorData[0];
-              _humidite = sensorData[1];
-              _pression = sensorData[2];
-              _temperature = sensorData[3];
-            });
+
+            if (mounted) {
+              setState(() {
+                _profile = sensorData[0];
+                _humidite = sensorData[1];
+                _pression = sensorData[2];
+                _temperature = sensorData[3];
+              });
+            }
           });
           return PageView(
             key: const Key('pageView'),
@@ -136,8 +140,15 @@ class _HomePageState extends State<HomePage> {
                         );
                       }),
                     )),
-                Text('The current profile is $_profile'),
-                const SizedBox(height: 50),
+                const SizedBox(height: 10),
+                Text(
+                  'The current profile is $_profile',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black.withOpacity(0.8),
+                  ),
+                ),
+                const SizedBox(height: 30),
                 profilSelector(),
                 const SizedBox(height: 20),
                 const Text(
@@ -474,6 +485,10 @@ class _HomePageState extends State<HomePage> {
         currentIcon = element['icon'];
       }
     }
-    _currentIcon = currentIcon;
+    if (mounted) {
+      setState(() {
+        _currentIcon = currentIcon;
+      });
+    }
   }
 }

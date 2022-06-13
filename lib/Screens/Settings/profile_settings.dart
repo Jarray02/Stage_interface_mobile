@@ -35,12 +35,7 @@ class _MyProfileSettingsState extends State<ProfileSettings> {
           backgroundColor: const Color.fromARGB(255, 24, 115, 185),
           leading: IconButton(
               color: Colors.white,
-              onPressed: () {
-                Navigator.pop(context);
-                //TODO : TEST
-                // Navigator.of(context).pushReplacement(MaterialPageRoute(
-                //     builder: (context) => const MyHomePage()));
-              },
+              onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.arrow_back)),
           centerTitle: true,
           title: const Text(
@@ -50,70 +45,104 @@ class _MyProfileSettingsState extends State<ProfileSettings> {
           elevation: 5.0,
         ),
         body: Container(
+          margin: const EdgeInsets.only(top: 80),
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           alignment: Alignment.center,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(
-                  child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      foregroundImage:
-                          CachedNetworkImageProvider(widget.userPic),
-                      radius: 70.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Center(
+              child: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  foregroundImage: CachedNetworkImageProvider(widget.userPic),
+                  radius: 70.0),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {},
+              child: const Text(
+                'Update your profile picture',
+                style: TextStyle(
+                  fontSize: 16,
                 ),
-                TextButton(
-                    onPressed: () {},
-                    child: const Text('Update your profile picture')),
-                const Divider(color: Colors.blue, height: 2.0),
-                Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text('Email'),
-                            const SizedBox(width: 10),
-                            Text(widget.userEmail!),
-                          ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 20.0,
+                horizontal: 20,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Email : ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black.withOpacity(0.8),
                         ),
-                        const Divider(color: Colors.blue, height: 2.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text('Name'),
-                            const SizedBox(width: 10),
-                            Text(widget.userName!),
-                          ],
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.userEmail!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                        const Divider(color: Colors.blue, height: 2.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text('Last Name'),
-                            const SizedBox(width: 10),
-                            Text(widget.userLastName!),
-                          ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Name : ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black.withOpacity(0.8),
                         ),
-                      ],
-                    )),
-                const Divider(color: Colors.blue, height: 2.0),
-                TextButton(
-                    onPressed: () async {
-                      await _ref.child(auth.currentUser!.uid).remove();
-                      await _auth.deleteUserAccount(context).then((value) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const ConnectWithEmail()));
-                      });
-                    },
-                    child: const Text('Delete your account')),
-              ]),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.userName!,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Last Name : ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black.withOpacity(0.8),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.userLastName!,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ]),
         ),
       ),
     );
